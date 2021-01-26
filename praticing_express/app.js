@@ -1,22 +1,22 @@
-const express = require('express');
-const bodyparse = require('body-parser');
 const path = require('path');
-const AdminRouter = require('./routes/admin');
-const ShopRouter  = require('./routes/shop');
-const dirname = require('./util/path');
+
+const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(bodyparse.urlencoded({extended:false}));
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
-app.use('/admin',AdminRouter);
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+const productControllers = require('./controllers/product')
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(ShopRouter);
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
-app.use((req,res,next) => {
-    res.status(404).sendFile(path.join(dirname,'views','404.html'));
-})
+app.use(productControllers.error404);
 
 app.listen(3000);
-
-
