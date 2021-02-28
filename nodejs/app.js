@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-  User.findById('5bab316ce0a7c75f783cb8a8')
+  User.findById('603b443674250e1010914efc')
     .then(user => {
       req.user = user;
       next();
@@ -32,9 +32,11 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
+// mongodb+srv://new-user_99:jashu1432@cluster0.sf8yh.mongodb.net/test?retryWrites=true&w=majority
+
 mongoose
   .connect(
-    'mongodb+srv://maximilian:9u4biljMQc4jjqbe@cluster0-ntrwp.mongodb.net/shop?retryWrites=true'
+    'mongodb://localhost:27017/shop'
   )
   .then(result => {
     User.findOne().then(user => {
@@ -49,8 +51,9 @@ mongoose
         user.save();
       }
     });
+    console.log("conncted");
     app.listen(3000);
   })
   .catch(err => {
     console.log(err);
-  });
+  }); 
