@@ -38,6 +38,7 @@ app.use(
     store: store
   })
 );
+
 app.use(csrfProtection);
 app.use(flash());
 
