@@ -1,10 +1,8 @@
 const express = require('express');
- 
-const app = express();
-
+const body_parser = require('body-parser');
+const mongoose = require('mongoose');
 const feedRoutes = require('./routes/feed');
-const body_parser = require('body-parser')
-
+const app = express();
 app.use(body_parser.json());
 
 app.use( (req, res, next) => {
@@ -14,4 +12,8 @@ app.use( (req, res, next) => {
     next();
 });
 app.use('/feed',feedRoutes);
-app.listen(8080);
+mongoose.connect('mongodb://localhost:27017/feed',{ useNewUrlParser: true }).then( result =>{
+    app.listen(8080);
+}).catch(err=>{
+    console.log(err);
+});

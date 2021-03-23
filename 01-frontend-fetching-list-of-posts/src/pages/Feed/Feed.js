@@ -106,12 +106,20 @@ class Feed extends Component {
       editLoading: true
     });
     // Set up data (with image!)
-    let url = 'URL';
+    let url =  'http://localhost:8080/feed/posts';
+    let method =  'POST';
     if (this.state.editPost) {
       url = 'URL';
     }
-
-    fetch(url)
+    fetch(url,{method:method,
+    headers:{
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify({
+      title:postData.title,
+      content : postData.content
+        })
+    })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error('Creating or editing a post failed!');
@@ -222,7 +230,7 @@ class Feed extends Component {
         <section className="feed">
           {this.state.postsLoading && (
             <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-              <Loader />
+              <Loader/>
             </div>
           )}
           {this.state.posts.length <= 0 && !this.state.postsLoading ? (
