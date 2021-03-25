@@ -14,4 +14,12 @@ router.post(
   ],
   feedcontroller.createPosts
 );
+router.get("/post/:postId",feedcontroller.getPostsById);
+router.put("/post/:postId",[
+  body("title").trim().isLength({ min: 5 }),
+  body("content").trim().isLength({ min: 5 }),
+],
+feedcontroller.updatePost
+);
+router.delete('/post/:postId',feedcontroller.deletePost);
 module.exports = router;
