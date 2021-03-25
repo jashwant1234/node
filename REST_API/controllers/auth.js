@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const { validationResult } = require("express-validator");
 const bcrypt = require('bcryptjs');
+const
+const user = require('../models/user');
 
 exports.sginup = (req,res,next) => {
     const errors = validationResult(req);
@@ -33,4 +35,28 @@ exports.sginup = (req,res,next) => {
             errors : err
         });
     });
+};
+
+//login an user
+exports.postLogin = (req,res,next) =>{
+    const email = req.body.email;
+    const password = req.body.password;
+    let loadUser;
+    User.findOne({email : email})
+    .then(user => {
+        if(!user){
+            return res.status(401).json({message : "email not authenticated"});    
+        }
+        loadUser = user;
+        return bcrypt.compare(password , user.password);
+    })
+   .then( isEqual => {
+       if(!isEqual){
+        return res.status(401).json({message : "password is incorect"});    
+       }
+       console.log("login");
+})
+    .catch(err => {
+        return res.status(500).json({error : err});
+    })
 };

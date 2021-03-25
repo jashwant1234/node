@@ -23,4 +23,6 @@ Router.put("/signup", [
   
 ],authController.sginup);
 
+Router.post('/login',authController.postLogin);
+
 module.exports = Router;
