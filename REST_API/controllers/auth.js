@@ -65,10 +65,10 @@ exports.postLogin = (req, res, next) => {
         "jashwant9658531212pradhan",
         { expiresIn: "1h" }
       );
-     return res.status(200).json({
-         token : token,
-         userId : loadUser._id.toString()
-     });
+      return res.status(200).json({
+        token: token,
+        userId: loadUser._id.toString(),
+      });
       //console.log("login");
     })
     .catch((err) => {
