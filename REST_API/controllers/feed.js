@@ -6,32 +6,53 @@ const Post = require("../models/post");
 const User = require("../models/user");
 
 //fatching all post
-exports.getPosts = (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
   //pagination
+  try {
   const currentpage = req.query.page || 1;
   const perPage = 2;
-  let totalItems;
-  Post.find()
-    .countDocuments()
-    .then((count) => {
-      totalItems = count;
-      return Post.find()
+  const totalItems = await Post.find().countDocuments();
+  const posts = await Post.find()
         .skip((currentpage - 1) * perPage)
         .limit(perPage);
-    })
-    .then((posts) => {
       return res.status(200).json({
         message: "Fetch successfully.",
         post: posts,
         totalItems: totalItems,
       });
-    })
-    .catch((err) => {
+  }
+  catch (err) {
       return res.status(500).json({
         error: err,
       });
-    });
+    };
 };
+
+  //then and catch like strutre
+  // const currentpage = req.query.page || 1;
+  // const perPage = 2;
+  // let totalItems;
+  // Post.find()
+  //   .countDocuments()
+  //   .then((count) => {
+  //     totalItems = count;
+  //     return Post.find()
+  //       .skip((currentpage - 1) * perPage)
+  //       .limit(perPage);
+  //   })
+  //   .then((posts) => {
+  //     return res.status(200).json({
+  //       message: "Fetch successfully.",
+  //       post: posts,
+  //       totalItems: totalItems,
+  //     });
+  //   })
+  //   .catch((err) => {
+  //     return res.status(500).json({
+  //       error: err,
+  //     });
+  //   });
+
 
 //creat a new post
 exports.createPosts = (req, res, next) => {
@@ -106,7 +127,7 @@ exports.getPostsById = (req, res, next) => {
     });
 };
 //update a post
-exports.updatePost = (req, res, next) => {
+exports.updatePost = async (req, res, next) => {
   const postId = req.params.postId;
   let imageUrl = req.body.image;
   const title = req.body.title;
@@ -120,8 +141,8 @@ exports.updatePost = (req, res, next) => {
       message: "No file picked.",
     });
   }
-  Post.findById(postId)
-    .then((post) => {
+  try {
+ const post = await Post.findById(postId);
       if (!post) {
         return res.status(404).json({
           message: "Could not find a post.",
@@ -138,21 +159,18 @@ exports.updatePost = (req, res, next) => {
       post.title = title;
       post.imageUrl = imageUrl;
       post.content = content;
-      return post.save();
-    })
-    .then((result) => {
+    const save = await post.save();
       return res.status(200).json({
         message: "Post updated!",
         post: result,
       });
-    })
-    .catch((err) => {
+    }
+    catch { (err)
       return res.status(500).json({
         error: err,
       });
-    });
+    };
 };
-
 //delete a post
 exports.deletePost = (req, res, nex) => {
   const postId = req.params.postId;
@@ -184,7 +202,7 @@ exports.deletePost = (req, res, nex) => {
       return res.status(200).json({
         message: "Post deleted!",
         post: result,
-      });
+      }); 
     })
     .catch((err) => {
       return res.status(500).json({
