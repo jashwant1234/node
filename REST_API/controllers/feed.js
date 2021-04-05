@@ -9,61 +9,60 @@ const User = require("../models/user");
 exports.getPosts = async (req, res, next) => {
   //pagination
   try {
-  const currentpage = req.query.page || 1;
-  const perPage = 2;
-  const totalItems = await Post.find().countDocuments();
-  const posts = await Post.find()
-        .skip((currentpage - 1) * perPage)
-        .limit(perPage);
-      return res.status(200).json({
-        message: "Fetch successfully.",
-        post: posts,
-        totalItems: totalItems,
-      });
+    const currentpage = req.query.page || 1;
+    const perPage = 2;
+    const totalItems = await Post.find().countDocuments();
+    const posts = await Post.find()
+      .skip((currentpage - 1) * perPage)
+      .limit(perPage);
+    return res.status(200).json({
+      message: "Fetch successfully.",
+      post: posts,
+      totalItems: totalItems,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      error: err,
+    });
   }
-  catch (err) {
-      return res.status(500).json({
-        error: err,
-      });
-    };
 };
 
-  //then and catch like strutre
-  // const currentpage = req.query.page || 1;
-  // const perPage = 2;
-  // let totalItems;
-  // Post.find()
-  //   .countDocuments()
-  //   .then((count) => {
-  //     totalItems = count;
-  //     return Post.find()
-  //       .skip((currentpage - 1) * perPage)
-  //       .limit(perPage);
-  //   })
-  //   .then((posts) => {
-  //     return res.status(200).json({
-  //       message: "Fetch successfully.",
-  //       post: posts,
-  //       totalItems: totalItems,
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     return res.status(500).json({
-  //       error: err,
-  //     });
-  //   });
-
+//then and catch like strutre
+// const currentpage = req.query.page || 1;
+// const perPage = 2;
+// let totalItems;
+// Post.find()
+//   .countDocuments()
+//   .then((count) => {
+//     totalItems = count;
+//     return Post.find()
+//       .skip((currentpage - 1) * perPage)
+//       .limit(perPage);
+//   })
+//   .then((posts) => {
+//     return res.status(200).json({
+//       message: "Fetch successfully.",
+//       post: posts,
+//       totalItems: totalItems,
+//     });
+//   })
+//   .catch((err) => {
+//     return res.status(500).json({
+//       error: err,
+//     });
+//   });
 
 //creat a new post
 exports.createPosts = (req, res, next) => {
   // console.log("i am here");
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      message: "Validation failed , Entered data is incorrect.",
-      errors: errors.array(),
-    });
-  }
+  // console.log(req.userId);
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return res.status(422).json({
+  //     message: "Validation failed , Entered data is incorrect.",
+  //     errors: errors.array(),
+  //   });
+  // }
   if (!req.file) {
     return res.status(422).json({
       message: "No image provided.",
@@ -77,23 +76,23 @@ exports.createPosts = (req, res, next) => {
     title: title,
     content: content,
     imageUrl: imageUrl,
-    creator: req.userId
+    creator: req.userId,
   });
   post
     .save()
     .then((result) => {
       return User.findById(req.userId);
     })
-    .then(user => {
-      user.posts.push(post);
+    .then((user) => {
+      user.post.push(post);
       // console.log(result);
       return user.save();
-      
-    }).then( result => {
+    })
+    .then((result) => {
       return res.status(201).json({
         message: "creted successfuly",
         post: post,
-        creator : creator
+        creator: creator,
       });
     })
     .catch((err) => {
@@ -142,34 +141,33 @@ exports.updatePost = async (req, res, next) => {
     });
   }
   try {
- const post = await Post.findById(postId);
-      if (!post) {
-        return res.status(404).json({
-          message: "Could not find a post.",
-        });
-      }
-      if(post.creator.toString() !== req.userId){
-        return res.status(403).json({
-          message: "Not authorized!",
-        });
-      }
-      if (post.imageUrl !== imageUrl) {
-        clearImage(post.imageUrl);
-      }
-      post.title = title;
-      post.imageUrl = imageUrl;
-      post.content = content;
-    const save = await post.save();
-      return res.status(200).json({
-        message: "Post updated!",
-        post: result,
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        message: "Could not find a post.",
       });
     }
-    catch { (err)
-      return res.status(500).json({
-        error: err,
+    if (post.creator.toString() !== req.userId) {
+      return res.status(403).json({
+        message: "Not authorized!",
       });
-    };
+    }
+    if (post.imageUrl !== imageUrl) {
+      clearImage(post.imageUrl);
+    }
+    post.title = title;
+    post.imageUrl = imageUrl;
+    post.content = content;
+    const save = await post.save();
+    return res.status(200).json({
+      message: "Post updated!",
+      post: save,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      error: err,
+    });
+  }
 };
 //delete a post
 exports.deletePost = (req, res, nex) => {
@@ -182,7 +180,7 @@ exports.deletePost = (req, res, nex) => {
           message: "Could not find a post.",
         });
       }
-      if(post.creator.toString() !== req.userId){
+      if (post.creator.toString() !== req.userId) {
         return res.status(403).json({
           message: "Not authorized!",
         });
@@ -194,15 +192,15 @@ exports.deletePost = (req, res, nex) => {
     .then((result) => {
       return User.findById(req.userId);
     })
-    .then( user => {
+    .then((user) => {
       user.posts.pull(postId);
       return user.save();
     })
-    .then( result => {
+    .then((result) => {
       return res.status(200).json({
         message: "Post deleted!",
         post: result,
-      }); 
+      });
     })
     .catch((err) => {
       return res.status(500).json({

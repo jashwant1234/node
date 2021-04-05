@@ -1,10 +1,10 @@
 const express = require("express");
 const { body } = require("express-validator");
-
 const router = express.Router();
-
 const feedcontroller = require("../controllers/feed");
 const isAuth = require("../middleware/is-auth");
+const upload = require("../multer/multer.js");
+
 
 router.get("/posts", isAuth, feedcontroller.getPosts);
 router.post(
@@ -14,6 +14,7 @@ router.post(
     body("title").trim().isLength({ min: 5 }),
     body("content").trim().isLength({ min: 5 }),
   ],
+  upload.single("image"),
   feedcontroller.createPosts
 );
 router.get("/post/:postId", isAuth, feedcontroller.getPostsById);
